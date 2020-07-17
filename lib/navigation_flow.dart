@@ -81,7 +81,7 @@ class _LinearFlowState<T extends FlowState> extends State<LinearFlow> {
   }
 
   @override
-  Widget build(BuildContext globalContext) {
+  Widget build(BuildContext _) {
     return WillPopScope(
       onWillPop: () async {
         _state.popPage();
@@ -94,7 +94,6 @@ class _LinearFlowState<T extends FlowState> extends State<LinearFlow> {
       },
       child: Navigator(
         key: _key,
-        onPopPage: (_, __) => true,
         initialRoute: _state.pageIndex.toString(),
         onGenerateRoute: (settings) {
           final index = int.parse(settings.name);
@@ -103,7 +102,8 @@ class _LinearFlowState<T extends FlowState> extends State<LinearFlow> {
           return widget.buildRoute(
             element.builder(
               (_context, arguments) async {
-                _state = await element.onNext(_context, arguments, _state);
+                final newState = await element.onNext(_context, arguments, _state);
+                _state = newState ?? _state;
                 _state.nextPage();
                 if (widget.flow.length == _state.pageIndex) {
                   Navigator.of(context).pop();
@@ -112,7 +112,8 @@ class _LinearFlowState<T extends FlowState> extends State<LinearFlow> {
                 }
               },
               (_context, arguments) async {
-                _state = await element.onPop(_context, arguments, _state);
+                final newState = await element.onPop(_context, arguments, _state);
+                _state = newState ?? _state;
                 _state.popPage();
                 if (_state.pageIndex >= 0) {
                   Navigator.of(_context).pop();
