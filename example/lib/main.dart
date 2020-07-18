@@ -1,5 +1,10 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:navigation_flow/navigation_flow.dart';
+import 'package:navigation_flow/arguments.dart';
+import 'package:navigation_flow/states.dart';
+import 'package:navigation_flow/linear_flow.dart';
+import 'package:navigation_flow/element.dart';
 
 void main() => runApp(MainApp());
 
@@ -12,9 +17,11 @@ class MainApp extends StatelessWidget {
           child: Builder(
             builder: (context) => RaisedButton(
               child: Text('Push Flow'),
-              onPressed: () => Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) => CustomFlow(),
-              )),
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => CustomFlow(),
+                ),
+              ),
             ),
           ),
         ),
@@ -23,16 +30,11 @@ class MainApp extends StatelessWidget {
   }
 }
 
-
 class MyPage extends StatelessWidget {
-  final OnFlowEvent onNext;
-  final OnFlowEvent onPop;
   final int index;
 
   const MyPage({
     Key key,
-    this.onNext,
-    this.onPop,
     this.index,
   }) : super(key: key);
 
@@ -52,13 +54,15 @@ class MyPage extends StatelessWidget {
                 RaisedButton(
                   child: Text('POP'),
                   onPressed: () {
-                    onPop(context, EmptyFlowArguments());
+                    NavigationFlow.of<EmptyFlowState, FlowArguments, FlowArguments>(context)
+                        .previous(context, EmptyFlowArguments());
                   },
                 ),
                 RaisedButton(
                   child: Text('NEXT'),
                   onPressed: () {
-                    onNext(context, EmptyFlowArguments());
+                    NavigationFlow.of<EmptyFlowState, FlowArguments, FlowArguments>(context)
+                        .next(context, EmptyFlowArguments());
                   },
                 ),
               ],
@@ -70,55 +74,75 @@ class MyPage extends StatelessWidget {
   }
 }
 
+class ActivePageFlowState extends FlowState {
+  int _index = 0;
+
+  int get index => _index;
+
+  void increment() => _index++;
+
+  void decrement() => _index--;
+}
+
 class CustomFlow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return LinearFlow(
+    return LinearFlow<EmptyFlowState>(
       initialState: EmptyFlowState(),
-      flow: <FlowElement>[
-        FlowElement(
-          onNext: (context, arguments, state) async {
-            print('onNext' + state.pageIndex.toString());
-            return state;
+      flow: [
+        FlowElement<EmptyFlowArguments, EmptyFlowArguments>(
+          onNext: (BuildContext context, EmptyFlowArguments arguments) async {
+            print('Next: Current Page 0');
           },
-          onPop: (context, arguments, state) async {
-            print('onPop' + state.pageIndex.toString());
-            return state;
+          onPop: (context, arguments) async {
+            print('Pop: Current Page 0');
           },
-          builder: (onNext, onPop, state) => MyPage(
-            onNext: onNext,
-            onPop: onPop,
-            index: state.pageIndex,
+          child: MyPage(
+            index: 0,
           ),
         ),
         FlowElement(
-          onNext: (context, arguments, state) async {
-            print('onNext' + state.pageIndex.toString());
-            return state;
+          onNext: (context, arguments) async {
+            print('Next: Current Page 1');
           },
-          onPop: (context, arguments, state) async {
-            print('onPop' + state.pageIndex.toString());
-            return state;
+          onPop: (context, arguments) async {
+            print('Pop: Current Page 1');
           },
-          builder: (onNext, onPop, state) => MyPage(
-            onNext: onNext,
-            onPop: onPop,
-            index: state.pageIndex,
+          child: MyPage(
+            index: 1,
           ),
         ),
         FlowElement(
-          onNext: (context, arguments, state) async {
-            print('onNext' + state.pageIndex.toString());
-            return state;
+          onNext: (context, arguments) async {
+            print('Next: Current Page 2');
           },
-          onPop: (context, arguments, state) async {
-            print('onPop' + state.pageIndex.toString());
-            return state;
+          onPop: (context, arguments) async {
+            print('Pop: Current Page 2');
           },
-          builder: (onNext, onPop, state) => MyPage(
-            onNext: onNext,
-            onPop: onPop,
-            index: state.pageIndex,
+          child: MyPage(
+            index: 2,
+          ),
+        ),
+        FlowElement(
+          onNext: (context, arguments) async {
+            print('Next: Current Page 3');
+          },
+          onPop: (context, arguments) async {
+            print('Pop: Current Page 3');
+          },
+          child: MyPage(
+            index: 3,
+          ),
+        ),
+        FlowElement(
+          onNext: (context, arguments) async {
+            print('Next: Current Page 4');
+          },
+          onPop: (context, arguments) async {
+            print('Pop: Current Page 4');
+          },
+          child: MyPage(
+            index: 4,
           ),
         ),
       ],

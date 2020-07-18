@@ -1,7 +1,7 @@
 name: navigation_flow
 description: With Navigation Flow you can push a procedure of pages from anywhere in the app.
-version: 0.0.1
-author:
+version: 0.1.0
+author: torben.keller.develop@gmail.com
 homepage:
 
 environment:

@@ -1,131 +1,60 @@
 library navigation_flow;
 
 import 'package:flutter/material.dart';
+import 'package:navigation_flow/arguments.dart';
+import 'package:navigation_flow/element.dart';
+import 'package:navigation_flow/states.dart';
 
-abstract class FlowArguments {}
+typedef UpdateFlowState<S extends FlowState> = void Function(S state);
 
-class EmptyFlowArguments implements FlowArguments {}
+typedef ExecutePrevious = void Function();
 
-abstract class FlowState {
-  int _pageIndex = 0;
+typedef ExecuteNext = void Function(BuildContext context);
 
-  FlowState([this._pageIndex = 0]);
+class NavigationFlow<S extends FlowState, N extends FlowArguments, P extends FlowArguments>
+    extends InheritedWidget {
+  final S state;
 
-  int get pageIndex => _pageIndex;
+  final UpdateFlowState<S> updateState;
+  final FlowElement<N, P> _element;
+  final ExecuteNext _executeNext;
+  final ExecutePrevious _executePrevious;
 
-  void nextPage() {
-    _pageIndex++;
-  }
-
-  void popPage() {
-    _pageIndex--;
-  }
-}
-
-class EmptyFlowState extends FlowState {}
-
-typedef HandleFlowEvent<T extends FlowArguments, S extends FlowState> = Future<S> Function(
-    BuildContext context, T, S);
-
-typedef OnFlowEvent<T extends FlowArguments> = Future<void> Function(
-    BuildContext context, T arguments);
-
-typedef FlowWidgetBuilder = Widget Function(OnFlowEvent onNext, OnFlowEvent onPop, FlowState state);
-
-class FlowElement {
-  final HandleFlowEvent onNext;
-  final HandleFlowEvent onPop;
-  final FlowWidgetBuilder builder;
-
-  FlowElement({
-    @required this.onNext,
-    @required this.onPop,
-    @required this.builder,
-  })  : assert(onNext != null),
-        assert(onPop != null),
-        assert(builder != null);
-}
-
-typedef BuildRoute = Route Function(Widget child);
-
-class LinearFlow<T extends FlowState> extends StatefulWidget {
-  final List<FlowElement> flow;
-  final FlowState initialState;
-  final BuildRoute _buildRoute;
-
-  BuildRoute get buildRoute =>
-      _buildRoute ?? (child) => MaterialPageRoute(builder: (context) => child);
-
-  const LinearFlow({
-    Key key,
-    @required this.flow,
-    @required this.initialState,
-    BuildRoute buildRoute,
-  })  : _buildRoute = buildRoute,
-        assert(flow != null && flow.length > 0),
-        assert(initialState != null),
-        super(key: key);
+  NavigationFlow({
+    @required this.state,
+    @required this.updateState,
+    @required Widget child,
+    @required FlowElement element,
+    @required ExecuteNext executeNext,
+    @required ExecutePrevious executePrevious,
+  })  : this._element = element,
+        this._executeNext = executeNext,
+        this._executePrevious = executePrevious,
+        assert(state != null),
+        assert(updateState != null),
+        assert(element != null),
+        assert(executeNext != null),
+        assert(executePrevious != null),
+        assert(child != null),
+        super(child: child);
 
   @override
-  _LinearFlowState createState() => _LinearFlowState<T>();
-}
+  bool updateShouldNotify(NavigationFlow oldWidget) => oldWidget.state != state;
 
-class _LinearFlowState<T extends FlowState> extends State<LinearFlow> {
-  GlobalKey<NavigatorState> _key = GlobalKey();
-  T _state;
-
-  @override
-  void initState() {
-    super.initState();
-    _state = widget.initialState;
+  static NavigationFlow of<S extends FlowState, N extends FlowArguments, P extends FlowArguments>(
+      BuildContext context) {
+    final result = context.dependOnInheritedWidgetOfExactType<NavigationFlow<S, N, P>>();
+    return result;
   }
 
-  @override
-  Widget build(BuildContext _) {
-    return WillPopScope(
-      onWillPop: () async {
-        _state.popPage();
-        if (_state.pageIndex >= 0) {
-          _key.currentState.pop();
-        } else {
-          Navigator.of(context).pop();
-        }
-        return false;
-      },
-      child: Navigator(
-        key: _key,
-        initialRoute: _state.pageIndex.toString(),
-        onGenerateRoute: (settings) {
-          final index = int.parse(settings.name);
-          final FlowElement element = widget.flow[index];
+  void next(BuildContext context, N arguments) async {
+    await _element.onNext(context, arguments);
+    _executeNext(context);
+  }
 
-          return widget.buildRoute(
-            element.builder(
-              (_context, arguments) async {
-                final newState = await element.onNext(_context, arguments, _state);
-                _state = newState ?? _state;
-                _state.nextPage();
-                if (widget.flow.length == _state.pageIndex) {
-                  Navigator.of(context).pop();
-                } else {
-                  Navigator.pushNamed(_context, _state.pageIndex.toString());
-                }
-              },
-              (_context, arguments) async {
-                final newState = await element.onPop(_context, arguments, _state);
-                _state = newState ?? _state;
-                _state.popPage();
-                if (_state.pageIndex >= 0) {
-                  Navigator.of(_context).pop();
-                } else {
-                  Navigator.of(context).pop();
-                }
-              },
-              _state,
-            ),
-          );
-        },
-      ),
-    );
+  void previous(BuildContext context, P arguments) async {
+    await _element.onPop(context, arguments);
+    _executePrevious();
   }
 }
+
