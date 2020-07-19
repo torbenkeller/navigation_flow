@@ -3,14 +3,16 @@ import 'package:navigation_flow/element.dart';
 import 'package:navigation_flow/navigation_flow.dart';
 import 'package:navigation_flow/states.dart';
 
-class LinearFlow<T extends EmptyFlowState> extends StatefulWidget {
+class LinearFlow<T extends FlowState> extends StatefulWidget {
   final List<FlowElement> flow;
   final T initialState;
+  final BuildRoute routeBuilder;
 
   const LinearFlow({
     Key key,
     @required this.flow,
     @required this.initialState,
+    this.routeBuilder,
   })  : assert(flow != null && flow.length > 0),
         assert(initialState != null),
         super(key: key);
@@ -19,7 +21,7 @@ class LinearFlow<T extends EmptyFlowState> extends StatefulWidget {
   _LinearFlowState createState() => _LinearFlowState<T>();
 }
 
-class _LinearFlowState<S extends EmptyFlowState> extends State<LinearFlow> {
+class _LinearFlowState<S extends FlowState> extends State<LinearFlow> {
   GlobalKey<NavigatorState> _key = GlobalKey();
   S _state;
   int _pageIndex = 0;
@@ -43,7 +45,10 @@ class _LinearFlowState<S extends EmptyFlowState> extends State<LinearFlow> {
         onGenerateRoute: (settings) {
           if (settings.name == '/next') {
             final element = widget.flow[_pageIndex];
-            return element.buildRoute(
+            final routeBuilder = element.routeBuilder ??
+                widget.routeBuilder ??
+                (child) => MaterialPageRoute(builder: (context) => child);
+            return routeBuilder(
               NavigationFlow(
                 element: element,
                 executeNext: _executePush,
@@ -54,7 +59,7 @@ class _LinearFlowState<S extends EmptyFlowState> extends State<LinearFlow> {
                     _state = state;
                   });
                 },
-                child: _PopHandler(child: element.child),
+                child: _PopHandler(child: element.page),
               ),
             );
           }
@@ -94,8 +99,8 @@ class _PopHandler extends StatelessWidget {
   Widget build(BuildContext context) {
     return WillPopScope(
         onWillPop: () async {
-          NavigationFlow.of(context).previous(context, null);
-          return false;
+          NavigationFlow.of(context).previous();
+          return true;
         },
         child: child);
   }

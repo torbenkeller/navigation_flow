@@ -11,12 +11,11 @@ typedef ExecutePrevious = void Function();
 
 typedef ExecuteNext = void Function(BuildContext context);
 
-class NavigationFlow<S extends FlowState, N extends FlowArguments, P extends FlowArguments>
-    extends InheritedWidget {
+class NavigationFlow<S extends FlowState> extends InheritedWidget {
   final S state;
 
   final UpdateFlowState<S> updateState;
-  final FlowElement<N, P> _element;
+  final FlowElement _element;
   final ExecuteNext _executeNext;
   final ExecutePrevious _executePrevious;
 
@@ -41,20 +40,17 @@ class NavigationFlow<S extends FlowState, N extends FlowArguments, P extends Flo
   @override
   bool updateShouldNotify(NavigationFlow oldWidget) => oldWidget.state != state;
 
-  static NavigationFlow of<S extends FlowState, N extends FlowArguments, P extends FlowArguments>(
-      BuildContext context) {
-    final result = context.dependOnInheritedWidgetOfExactType<NavigationFlow<S, N, P>>();
+  static NavigationFlow<S> of<S extends FlowState>(BuildContext context) {
+    final result = context.dependOnInheritedWidgetOfExactType<NavigationFlow<S>>();
     return result;
   }
 
-  void next(BuildContext context, N arguments) async {
+  void next(BuildContext context, FlowArguments arguments) async {
     await _element.onNext(context, arguments);
     _executeNext(context);
   }
 
-  void previous(BuildContext context, P arguments) async {
-    await _element.onPop(context, arguments);
+  void previous() async {
     _executePrevious();
   }
 }
-

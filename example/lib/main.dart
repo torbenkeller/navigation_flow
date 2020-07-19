@@ -10,7 +10,7 @@ void main() => runApp(MainApp());
 
 class MainApp extends StatelessWidget {
   @override
-  Widget build(BuildContext oldcontext) {
+  Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
         body: Center(
@@ -52,17 +52,16 @@ class MyPage extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 RaisedButton(
-                  child: Text('POP'),
+                  child: Text('PREVIOUS'),
                   onPressed: () {
-                    NavigationFlow.of<EmptyFlowState, FlowArguments, FlowArguments>(context)
-                        .previous(context, EmptyFlowArguments());
+                    NavigationFlow.of<MyState>(context).previous();
                   },
                 ),
                 RaisedButton(
                   child: Text('NEXT'),
                   onPressed: () {
-                    NavigationFlow.of<EmptyFlowState, FlowArguments, FlowArguments>(context)
-                        .next(context, EmptyFlowArguments());
+                    NavigationFlow.of<MyState>(context)
+                        .next(context, MyArguments('My Argument ', index));
                   },
                 ),
               ],
@@ -74,76 +73,56 @@ class MyPage extends StatelessWidget {
   }
 }
 
-class ActivePageFlowState extends FlowState {
-  int _index = 0;
+class MyArguments extends FlowArguments {
+  final String myArgument1;
+  final int myArgument2;
 
-  int get index => _index;
+  MyArguments(this.myArgument1, this.myArgument2);
+}
 
-  void increment() => _index++;
+class MyState extends FlowState {
+  final String myString;
 
-  void decrement() => _index--;
+  MyState(this.myString);
 }
 
 class CustomFlow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return LinearFlow<EmptyFlowState>(
-      initialState: EmptyFlowState(),
+    return LinearFlow<MyState>(
+      initialState: MyState(''),
       flow: [
-        FlowElement<EmptyFlowArguments, EmptyFlowArguments>(
-          onNext: (BuildContext context, EmptyFlowArguments arguments) async {
-            print('Next: Current Page 0');
+        FlowElement(
+          onNext: (BuildContext context, arguments) {
+            String myString = NavigationFlow.of<MyState>(context).state.myString;
+            NavigationFlow.of<MyState>(context).updateState(MyState(myString + 'a '));
+            print(NavigationFlow.of<MyState>(context).state.myString);
           },
-          onPop: (context, arguments) async {
-            print('Pop: Current Page 0');
-          },
-          child: MyPage(
-            index: 0,
-          ),
+          page: MyPage(index: 0),
         ),
         FlowElement(
-          onNext: (context, arguments) async {
-            print('Next: Current Page 1');
+          onNext: (BuildContext context, arguments) {
+            String myString = NavigationFlow.of<MyState>(context).state.myString;
+            NavigationFlow.of<MyState>(context).updateState(MyState(myString + 'a '));
+            print(NavigationFlow.of<MyState>(context).state.myString);
           },
-          onPop: (context, arguments) async {
-            print('Pop: Current Page 1');
-          },
-          child: MyPage(
-            index: 1,
-          ),
+          page: MyPage(index: 1),
         ),
         FlowElement(
-          onNext: (context, arguments) async {
-            print('Next: Current Page 2');
+          onNext: (BuildContext context, arguments) {
+            String myString = NavigationFlow.of<MyState>(context).state.myString;
+            NavigationFlow.of<MyState>(context).updateState(MyState(myString + 'a '));
+            print(NavigationFlow.of<MyState>(context).state.myString);
           },
-          onPop: (context, arguments) async {
-            print('Pop: Current Page 2');
-          },
-          child: MyPage(
-            index: 2,
-          ),
+          page: MyPage(index: 2),
         ),
         FlowElement(
-          onNext: (context, arguments) async {
-            print('Next: Current Page 3');
+          onNext: (BuildContext context, arguments) {
+            String myString = NavigationFlow.of<MyState>(context).state.myString;
+            NavigationFlow.of<MyState>(context).updateState(MyState(myString + 'a '));
+            print(NavigationFlow.of<MyState>(context).state.myString);
           },
-          onPop: (context, arguments) async {
-            print('Pop: Current Page 3');
-          },
-          child: MyPage(
-            index: 3,
-          ),
-        ),
-        FlowElement(
-          onNext: (context, arguments) async {
-            print('Next: Current Page 4');
-          },
-          onPop: (context, arguments) async {
-            print('Pop: Current Page 4');
-          },
-          child: MyPage(
-            index: 4,
-          ),
+          page: MyPage(index: 3),
         ),
       ],
     );
