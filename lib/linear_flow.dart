@@ -39,7 +39,6 @@ class _LinearFlowState<S extends FlowState> extends State<LinearFlow> with Navig
   void didPush(Route route, Route previousRoute) {
     super.didPush(route, previousRoute);
     _pageIndex++;
-    print(_pageIndex.toString());
   }
 
   @override
