@@ -40,7 +40,7 @@ class NavigationFlow<S extends FlowState> extends InheritedWidget {
   }
 
   void next(BuildContext context, FlowArguments arguments) async {
-    await _element.onNext(context, arguments);
+    if (_element.onNext != null) await _element.onNext(context, arguments);
     _executeNext(context);
   }
 }

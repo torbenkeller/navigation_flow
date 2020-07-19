@@ -97,7 +97,10 @@ class CustomFlow extends StatelessWidget {
           onNext: (BuildContext context, arguments) {
             String myString = NavigationFlow.of<MyState>(context).state.myString;
             NavigationFlow.of<MyState>(context).updateState(MyState(myString + 'a '));
-//            print(NavigationFlow.of<MyState>(context).state.myString);
+            print(NavigationFlow.of<MyState>(context).state.myString);
+          },
+          onPrevious: (){
+
           },
           page: MyPage(index: 0),
         ),
