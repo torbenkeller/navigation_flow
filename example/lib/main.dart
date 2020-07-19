@@ -54,7 +54,8 @@ class MyPage extends StatelessWidget {
                 RaisedButton(
                   child: Text('PREVIOUS'),
                   onPressed: () {
-                    NavigationFlow.of<MyState>(context).previous();
+//                    NavigationFlow.of<MyState>(context).previous();
+                    Navigator.of(context).pop();
                   },
                 ),
                 RaisedButton(
@@ -96,7 +97,7 @@ class CustomFlow extends StatelessWidget {
           onNext: (BuildContext context, arguments) {
             String myString = NavigationFlow.of<MyState>(context).state.myString;
             NavigationFlow.of<MyState>(context).updateState(MyState(myString + 'a '));
-            print(NavigationFlow.of<MyState>(context).state.myString);
+//            print(NavigationFlow.of<MyState>(context).state.myString);
           },
           page: MyPage(index: 0),
         ),
@@ -104,7 +105,7 @@ class CustomFlow extends StatelessWidget {
           onNext: (BuildContext context, arguments) {
             String myString = NavigationFlow.of<MyState>(context).state.myString;
             NavigationFlow.of<MyState>(context).updateState(MyState(myString + 'a '));
-            print(NavigationFlow.of<MyState>(context).state.myString);
+//            print(NavigationFlow.of<MyState>(context).state.myString);
           },
           page: MyPage(index: 1),
         ),
@@ -112,7 +113,7 @@ class CustomFlow extends StatelessWidget {
           onNext: (BuildContext context, arguments) {
             String myString = NavigationFlow.of<MyState>(context).state.myString;
             NavigationFlow.of<MyState>(context).updateState(MyState(myString + 'a '));
-            print(NavigationFlow.of<MyState>(context).state.myString);
+//            print(NavigationFlow.of<MyState>(context).state.myString);
           },
           page: MyPage(index: 2),
         ),
@@ -120,7 +121,7 @@ class CustomFlow extends StatelessWidget {
           onNext: (BuildContext context, arguments) {
             String myString = NavigationFlow.of<MyState>(context).state.myString;
             NavigationFlow.of<MyState>(context).updateState(MyState(myString + 'a '));
-            print(NavigationFlow.of<MyState>(context).state.myString);
+//            print(NavigationFlow.of<MyState>(context).state.myString);
           },
           page: MyPage(index: 3),
         ),

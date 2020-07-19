@@ -3,18 +3,21 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:navigation_flow/arguments.dart';
 
-typedef HandleFlowEvent = FutureOr<void> Function(BuildContext context, FlowArguments);
+typedef OnNext = FutureOr<void> Function(BuildContext context, FlowArguments);
 
-typedef OnFlowEvent = Future<void> Function(BuildContext context, FlowArguments arguments);
+typedef OnPrevious = FutureOr<void> Function();
 
 typedef BuildRoute = Route Function(Widget child);
 
 /// An element which can be passed into the flow.
 class FlowElement {
-  /// This callback gets called when you use `NavigationFlow.of<..>(context).next(.., ..)`.
+  /// Will be called when you use `NavigationFlow.of<..>(context).next(.., ..)`.
   /// When you expect a specific arguments class, use `if(agruments is YOUR_ARGUMENTS)` to use the fields
   /// of your argument.
-  final HandleFlowEvent onNext;
+  final OnNext onNext;
+
+  /// Will be called when you use `NavigationFlow.of<..>(context).previous()` or `Navigator.of(context).pop()`.
+  final OnPrevious onPrevious;
 
   /// The page that gets displayed.
   final Widget page;
@@ -26,6 +29,7 @@ class FlowElement {
   FlowElement({
     @required this.page,
     this.onNext,
+    this.onPrevious,
     this.routeBuilder,
   }) : assert(page != null);
 }

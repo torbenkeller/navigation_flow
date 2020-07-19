@@ -21,10 +21,26 @@ class LinearFlow<T extends FlowState> extends StatefulWidget {
   _LinearFlowState createState() => _LinearFlowState<T>();
 }
 
-class _LinearFlowState<S extends FlowState> extends State<LinearFlow> {
-  GlobalKey<NavigatorState> _key = GlobalKey();
+class _LinearFlowState<S extends FlowState> extends State<LinearFlow> with NavigatorObserver {
   S _state;
-  int _pageIndex = 0;
+  int _pageIndex = -1;
+
+  @override
+  void didPop(Route<dynamic> route, Route<dynamic> previousRoute) {
+    if (widget.flow[_pageIndex]?.onPrevious != null) widget.flow[_pageIndex].onPrevious();
+    if (_pageIndex == 0) {
+      Navigator.of(context).pop();
+    }
+    _pageIndex--;
+    super.didPop(route, previousRoute);
+  }
+
+  @override
+  void didPush(Route route, Route previousRoute) {
+    super.didPush(route, previousRoute);
+    _pageIndex++;
+    print(_pageIndex.toString());
+  }
 
   @override
   void initState() {
@@ -40,11 +56,11 @@ class _LinearFlowState<S extends FlowState> extends State<LinearFlow> {
         return false;
       },
       child: Navigator(
-        key: _key,
         initialRoute: '/next',
+        observers: [this],
         onGenerateRoute: (settings) {
-          if (settings.name == '/next') {
-            final element = widget.flow[_pageIndex];
+          if (settings.name == '/next' && _pageIndex != widget.flow.length - 1) {
+            final element = widget.flow[_pageIndex + 1];
             final routeBuilder = element.routeBuilder ??
                 widget.routeBuilder ??
                 (child) => MaterialPageRoute(builder: (context) => child);
@@ -52,14 +68,13 @@ class _LinearFlowState<S extends FlowState> extends State<LinearFlow> {
               NavigationFlow(
                 element: element,
                 executeNext: _executePush,
-                executePrevious: _executePop,
                 state: _state,
                 updateState: (S state) {
                   setState(() {
                     _state = state;
                   });
                 },
-                child: _PopHandler(child: element.page),
+                child: element.page,
               ),
             );
           }
@@ -73,35 +88,15 @@ class _LinearFlowState<S extends FlowState> extends State<LinearFlow> {
     if (widget.flow.length == _pageIndex + 1) {
       Navigator.of(context).pop();
     } else {
-      _pageIndex++;
-      _key.currentState.pushNamed('/next');
+      navigator.pushNamed('/next');
     }
   }
 
   void _executePop() {
     if (_pageIndex > 0) {
-      _pageIndex--;
-      _key.currentState.pop();
+      navigator.pop();
     } else {
       Navigator.of(context).pop();
     }
-  }
-}
-
-class _PopHandler extends StatelessWidget {
-  final Widget child;
-
-  const _PopHandler({Key key, @required this.child})
-      : assert(child != null),
-        super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return WillPopScope(
-        onWillPop: () async {
-          NavigationFlow.of(context).previous();
-          return true;
-        },
-        child: child);
   }
 }
