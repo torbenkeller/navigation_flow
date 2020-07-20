@@ -48,7 +48,7 @@ NavigationFlow.of<YOUR_FLOW_STATE>(context).updateState(YOUR_NEW_FLOW_STATE);
 
 ## Example
 
-<img src="https://github.com/torbenkeller/navigation_flow/blob/master/assets/ezgif-2-fafe6a35f39e.gif" alt="drawing" height="350">
+<img src="https://github.com/torbenkeller/navigation_flow/blob/master/assets/ezgif-2-fafe6a35f39e.gif" alt="drawing" height="500">
 
 ```dart
 import 'package:navigation_flow/navigation_flow.dart';
