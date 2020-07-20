@@ -48,6 +48,8 @@ NavigationFlow.of<YOUR_FLOW_STATE>(context).updateState(YOUR_NEW_FLOW_STATE);
 
 ## Example
 
+<img src="https://raw.githubusercontent.com/torbenkeller/expandable_bottom_sheet/master/assets/expandable_bottom_sheet_easy.gif">
+
 ```dart
 import 'package:navigation_flow/navigation_flow.dart';
 
