@@ -2,7 +2,8 @@ name: navigation_flow
 description: With Navigation Flow you can push a procedure of pages from anywhere in the app.
 version: 0.1.0
 author: Torben Keller <torben@yamuntu.com>
-homepage:
+repository: "https://github.com/torbenkeller/navigation_flow/"
+
 
 environment:
   sdk: ">=2.7.0 <3.0.0"
