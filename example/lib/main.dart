@@ -40,6 +40,7 @@ class MyPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print(NavigationFlow.of<MyState>(context).state.myString);
     return Scaffold(
       body: Stack(
         children: <Widget>[
@@ -54,7 +55,6 @@ class MyPage extends StatelessWidget {
                 RaisedButton(
                   child: Text('PREVIOUS'),
                   onPressed: () {
-//                    NavigationFlow.of<MyState>(context).previous();
                     Navigator.of(context).pop();
                   },
                 ),
@@ -63,6 +63,12 @@ class MyPage extends StatelessWidget {
                   onPressed: () {
                     NavigationFlow.of<MyState>(context)
                         .next(context, MyArguments('My Argument ', index));
+                  },
+                ),
+                RaisedButton(
+                  child: Text('update'),
+                  onPressed: () {
+                    NavigationFlow.of<MyState>(context).updateState(MyState('asfd'));
                   },
                 ),
               ],
@@ -99,9 +105,7 @@ class CustomFlow extends StatelessWidget {
             NavigationFlow.of<MyState>(context).updateState(MyState(myString + 'a '));
             print(NavigationFlow.of<MyState>(context).state.myString);
           },
-          onPrevious: (){
-
-          },
+          onPrevious: () {},
           page: MyPage(index: 0),
         ),
         FlowElement(

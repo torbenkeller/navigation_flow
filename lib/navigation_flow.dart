@@ -10,11 +10,14 @@ typedef UpdateFlowState<S extends FlowState> = void Function(S state);
 typedef ExecuteNext = void Function(BuildContext context);
 
 class NavigationFlow<S extends FlowState> extends InheritedWidget {
-  final S state;
-
-  final UpdateFlowState<S> updateState;
   final FlowElement _element;
   final ExecuteNext _executeNext;
+
+  /// The current state of the NavigationFlow
+  final S state;
+
+  /// Sets the state to the passed one and
+  final UpdateFlowState<S> updateState;
 
   NavigationFlow({
     @required this.state,
@@ -39,6 +42,9 @@ class NavigationFlow<S extends FlowState> extends InheritedWidget {
     return result;
   }
 
+  /// Pushes the next page and calls `onNext` of the `FLowElement`.
+  /// You can also use `Navigator.of(context).push('/next')` to get the next page but
+  /// it's not recommended because the `onNext` function of the `FlowElement` is not called then.
   void next(BuildContext context, FlowArguments arguments) async {
     if (_element.onNext != null) await _element.onNext(context, arguments);
     _executeNext(context);
