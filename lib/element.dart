@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:navigation_flow/arguments.dart';
+import './arguments.dart';
 
 typedef OnNext = FutureOr<void> Function(BuildContext context, FlowArguments);
 

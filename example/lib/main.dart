@@ -1,10 +1,5 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:navigation_flow/navigation_flow.dart';
-import 'package:navigation_flow/arguments.dart';
-import 'package:navigation_flow/states.dart';
-import 'package:navigation_flow/linear_flow.dart';
-import 'package:navigation_flow/element.dart';
 
 void main() => runApp(MainApp());
 
@@ -30,109 +25,76 @@ class MainApp extends StatelessWidget {
   }
 }
 
-class MyPage extends StatelessWidget {
-  final int index;
+class MyState extends FlowState {
+  final String state1;
 
-  const MyPage({
-    Key key,
-    this.index,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    print(NavigationFlow.of<MyState>(context).state.myString);
-    return Scaffold(
-      body: Stack(
-        children: <Widget>[
-          Center(
-            child: Text(index.toString()),
-          ),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                RaisedButton(
-                  child: Text('PREVIOUS'),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-                RaisedButton(
-                  child: Text('NEXT'),
-                  onPressed: () {
-                    NavigationFlow.of<MyState>(context)
-                        .next(context, MyArguments('My Argument ', index));
-                  },
-                ),
-                RaisedButton(
-                  child: Text('update'),
-                  onPressed: () {
-                    NavigationFlow.of<MyState>(context).updateState(MyState('asfd'));
-                  },
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  MyState(this.state1);
 }
 
 class MyArguments extends FlowArguments {
-  final String myArgument1;
-  final int myArgument2;
+  final String argument1;
 
-  MyArguments(this.myArgument1, this.myArgument2);
-}
-
-class MyState extends FlowState {
-  final String myString;
-
-  MyState(this.myString);
+  MyArguments(this.argument1);
 }
 
 class CustomFlow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return LinearFlow<MyState>(
-      initialState: MyState(''),
+      initialState: MyState('initial'),
       flow: [
         FlowElement(
           onNext: (BuildContext context, arguments) {
-            String myString = NavigationFlow.of<MyState>(context).state.myString;
-            NavigationFlow.of<MyState>(context).updateState(MyState(myString + 'a '));
-            print(NavigationFlow.of<MyState>(context).state.myString);
+            // access arguments
+            if (arguments is MyArguments) {
+              print(arguments.argument1);
+            }
+
+            NavigationFlow.of<MyState>(context).updateState(MyState('updated'));
+
+            // your logic
           },
-          onPrevious: () {},
-          page: MyPage(index: 0),
+          onPrevious: () {
+            // your logic
+          },
+          page: MyPage(),
         ),
         FlowElement(
-          onNext: (BuildContext context, arguments) {
-            String myString = NavigationFlow.of<MyState>(context).state.myString;
-            NavigationFlow.of<MyState>(context).updateState(MyState(myString + 'a '));
-//            print(NavigationFlow.of<MyState>(context).state.myString);
-          },
-          page: MyPage(index: 1),
+          page: MyPage(),
         ),
         FlowElement(
-          onNext: (BuildContext context, arguments) {
-            String myString = NavigationFlow.of<MyState>(context).state.myString;
-            NavigationFlow.of<MyState>(context).updateState(MyState(myString + 'a '));
-//            print(NavigationFlow.of<MyState>(context).state.myString);
-          },
-          page: MyPage(index: 2),
-        ),
-        FlowElement(
-          onNext: (BuildContext context, arguments) {
-            String myString = NavigationFlow.of<MyState>(context).state.myString;
-            NavigationFlow.of<MyState>(context).updateState(MyState(myString + 'a '));
-//            print(NavigationFlow.of<MyState>(context).state.myString);
-          },
-          page: MyPage(index: 3),
+          page: MyPage(),
         ),
       ],
+    );
+  }
+}
+
+class MyPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            RaisedButton(
+              child: Text('PREVIOUS'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            RaisedButton(
+              child: Text('NEXT'),
+              onPressed: () {
+                NavigationFlow.of<MyState>(context)
+                    .next(context, MyArguments('the argument content'));
+              },
+            ),
+            Text(NavigationFlow.of<MyState>(context).state.state1),
+          ],
+        ),
+      ),
     );
   }
 }

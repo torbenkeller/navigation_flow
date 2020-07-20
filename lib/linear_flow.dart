@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:navigation_flow/element.dart';
-import 'package:navigation_flow/navigation_flow.dart';
-import 'package:navigation_flow/states.dart';
+import './element.dart';
+import './navigation_flow.dart';
+import './states.dart';
+import './navigation_flow_widget.dart';
 
 /// Handles the linear flow of pages for you.
 /// You can call the next page with `NavigationFlow.of<YOUR_STATE>(context).next(context, YOUR_ARGUMENT);`.
 /// You can get the current state with `NavigationFlow.of<YOUR_STATE>(context).state;`.
 /// You can update the current state with `NavigationFlow.of<YOUR_STATE>(context).updateState(NEW_STATE);`.
 class LinearFlow<T extends FlowState> extends StatefulWidget {
-
   /// The flow of pages in order of the list. So the first element of the list is the first page in the flow
   /// and the last element is the last page in the flow.
   ///
